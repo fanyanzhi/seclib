@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:aop="http://www.springframework.org/schema/aop"
+	xmlns:tx="http://www.springframework.org/schema/tx"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans-4.0.xsd
+            http://www.springframework.org/schema/aop http://www.springframework.org/schema/aop/spring-aop-4.0.xsd
+            http://www.springframework.org/schema/tx http://www.springframework.org/schema/tx/spring-tx-4.0.xsd">
+	<!-- 
+		"0 0 12 * * ?" 	   	每天中午十二点触发
+		"0 15 10 ? * *" 	   	每天早上10：15触发
+		"0 15 10 * * ?" 	   	每天早上10：15触发
+		"0 15 10 * * ? *" 	   	每天早上10：15触发
+		"0 15 10 * * ? 2005" 	   	2005年的每天早上10：15触发
+		"0 * 14 * * ?" 	   	每天从下午2点开始到2点59分每分钟一次触发
+		"0 0/5 14 * * ?" 	   	每天从下午2点开始到2：55分结束每5分钟一次触发
+		"0 0/5 14,18 * * ?" 	   	每天的下午2点至2：55和6点至6点55分两个时间段内每5分钟一次触发
+		"0 0-5 14 * * ?" 	   	每天14:00至14:05每分钟一次触发
+		"0 10,44 14 ? 3 WED" 	   	三月的每周三的14：10和14：44触发
+		"0 15 10 ? * MON-FRI" 	   	每个周一、周二、周三、周四、周五的10：15触发
+		"0 15 10 15 * ?" 	   	每月15号的10：15触发
+		"0 15 10 L * ?" 	   	每月的最后一天的10：15触发
+		"0 15 10 ? * 6L" 	   	每月最后一个周五的10：15触发
+		"0 15 10 ? * 6L" 	   	每月最后一个周五的10：15触发
+		"0 15 10 ? * 6L 2002-2005" 	   	2002年至2005年的每月最后一个周五的10：15触发
+		"0 15 10 ? * 6#3" 	   	每月的第三个周五的10：15触发
+		"0 0/1 * * * ?" 每分钟触发
+	 -->
+	
+	<!-- 测试1，每隔10秒显示111 -->
+	<bean id="testTrigger1" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+				<property name="targetObject" ref="scheduleServiceImpl"/>
+				<property name="targetMethod" value="show" />
+			</bean>
+		</property>
+		
+		<property name="cronExpression">
+			<value>0/10 * * * * ?</value> 
+		</property>
+	</bean>
+	
+	<!-- 图书到期提醒 -->
+	<bean id="task1" class="org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+		<property name="jobDetail">
+			<bean class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+				<property name="targetObject" ref="scheduleServiceImpl"/>
+				<property name="targetMethod" value="returnBookNotice" />
+			</bean>
+		</property>
+		
+		<property name="cronExpression">
+			<value>0 5 9 * * ?</value> 
+			<!-- 每天上午9点触发 -->
+		</property>
+	</bean>
+	
+	
+	<!-- 定时器工厂 -->
+	<bean class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+		<property name="triggers">
+			<list>
+				<!-- <ref bean="testTrigger1" /> -->
+				<ref bean="task1" />
+			</list>
+		</property>
+	</bean>
+	
+</beans>
